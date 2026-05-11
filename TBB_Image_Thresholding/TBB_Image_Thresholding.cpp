@@ -2,6 +2,7 @@
 //
 
 #include <opencv2/opencv.hpp>
+#include <tbb/tbb.h>
 
 #include <iostream>
 #include <filesystem>
@@ -14,13 +15,11 @@ namespace fs = std::filesystem;
 std::vector<std::string> getImagePaths(const std::string& folderPath)
 {
     std::vector<std::string> imagePaths;
-
     for (const auto& entry : fs::directory_iterator(folderPath))
     {
         if (entry.is_regular_file())
         {
             std::string extension = entry.path().extension().string();
-
             if (extension == ".jpg" || extension == ".jpeg" ||
                 extension == ".png" || extension == ".bmp")
             {
@@ -28,11 +27,10 @@ std::vector<std::string> getImagePaths(const std::string& folderPath)
             }
         }
     }
-
     return imagePaths;
 }
 
-void processImageSequential(const std::string& inputPath, const std::string& outputFolder)
+void processImage(const std::string& inputPath, const std::string& outputFolder)
 {
     cv::Mat image = cv::imread(inputPath);
 
@@ -44,7 +42,7 @@ void processImageSequential(const std::string& inputPath, const std::string& out
 
     cv::Mat gray;
     cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
-        
+
     cv::Mat binary;
     cv::adaptiveThreshold(
         gray,
@@ -65,7 +63,7 @@ void processImageSequential(const std::string& inputPath, const std::string& out
 int main()
 {
     std::string inputFolder = "dataset";
-    std::string outputFolder = "output_sequential";
+    std::string outputFolder = "output_tbb_inter";
 
     fs::create_directories(outputFolder);
 
@@ -78,22 +76,26 @@ int main()
     }
 
     std::cout << "Found " << imagePaths.size() << " images." << std::endl;
+    std::cout << "Starting TBB Inter-Image parallel processing..." << std::endl;
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    for (const auto& imagePath : imagePaths)
-    {
-        processImageSequential(imagePath, outputFolder);
-    }
+    tbb::parallel_for_each(
+        imagePaths.begin(),
+        imagePaths.end(),
+        [&outputFolder](const std::string& imagePath)
+        {
+            processImage(imagePath, outputFolder);
+        }
+    );
 
     auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> elapsed = end - start;
-
     double totalTime = elapsed.count();
     double throughput = imagePaths.size() / totalTime;
 
-    std::cout << "\nSequential processing finished." << std::endl;
+    std::cout << "\nTBB Inter-Image processing finished." << std::endl;
     std::cout << "Total time: " << totalTime << " seconds" << std::endl;
     std::cout << "Throughput: " << throughput << " images/second" << std::endl;
 
