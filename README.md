@@ -29,8 +29,71 @@ Conform cerințelor, raportul va include:
 5.  **Interpretarea rezultatelor:** Analiză personală a datelor și a scalabilității.
 
 ## 📁 Dataset
-* Set de imagini de pe **Kaggle**.
 
-## 📦 Livrabile Finale
-* **Repository Git:** Branch-uri separate pentru fiecare implementare, cu commit-uri granulare și mesaje descriptive.
-* **Raport scris.**
+Dataset-ul utilizat în cadrul proiectului:
+
+* License Plate Dataset (Kaggle):
+  https://www.kaggle.com/datasets/ronakgohil/license-plate-dataset
+
+Imaginile sunt utilizate pentru aplicarea algoritmului de adaptive thresholding / image binarization și pentru analiza performanței strategiilor de paralelizare.
+
+---
+
+## ⚙️ Requirements / Dependencies
+
+Pentru rularea proiectului sunt necesare:
+
+* Visual Studio Community 2022 sau Visual Studio Community 2026
+* C++17
+* OpenCV
+* Intel oneTBB (Threading Building Blocks)
+* vcpkg
+
+---
+
+## 🔧 Instalare vcpkg
+
+```powershell
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+.\bootstrap-vcpkg.bat
+```
+
+Integrarea vcpkg cu Visual Studio:
+
+```powershell
+.\vcpkg integrate install
+```
+
+Instalarea bibliotecilor necesare:
+
+```powershell
+.\vcpkg install opencv:x64-windows
+.\vcpkg install tbb:x64-windows
+```
+
+---
+
+## ▶️ Rulare Proiect
+
+1. Deschideți soluția `.sln` în Visual Studio.
+2. Selectați:
+
+   * `Debug | x64`
+3. Asigurați-vă că standardul C++ este:
+
+   * `ISO C++17`
+4. Rulați proiectul folosind:
+
+   * `Ctrl + F5`
+
+---
+
+## 🌿 Branch-uri
+
+Proiectul este organizat pe branch-uri separate:
+
+* `main` → versiunea finală
+* `secvential` → implementare secvențială
+* `tbb-inter` → paralelizare între imagini
+* `tbb-intra` → paralelizare în interiorul imaginii
