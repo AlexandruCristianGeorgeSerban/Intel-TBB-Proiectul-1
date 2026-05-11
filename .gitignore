@@ -427,3 +427,8 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Generated image outputs
+output_sequential/
+output_tbb_inter/
+output_tbb_intra/
