@@ -1,11 +1,102 @@
 // TBB_Image_Thresholding.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+#include <opencv2/opencv.hpp>
+
 #include <iostream>
+#include <filesystem>
+#include <vector>
+#include <chrono>
+#include <string>
+
+namespace fs = std::filesystem;
+
+std::vector<std::string> getImagePaths(const std::string& folderPath)
+{
+    std::vector<std::string> imagePaths;
+
+    for (const auto& entry : fs::directory_iterator(folderPath))
+    {
+        if (entry.is_regular_file())
+        {
+            std::string extension = entry.path().extension().string();
+
+            if (extension == ".jpg" || extension == ".jpeg" ||
+                extension == ".png" || extension == ".bmp")
+            {
+                imagePaths.push_back(entry.path().string());
+            }
+        }
+    }
+
+    return imagePaths;
+}
+
+void processImageSequential(const std::string& inputPath, const std::string& outputFolder)
+{
+    cv::Mat image = cv::imread(inputPath);
+
+    if (image.empty())
+    {
+        std::cout << "Could not read image: " << inputPath << std::endl;
+        return;
+    }
+
+    cv::Mat gray;
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+        
+    cv::Mat binary;
+    cv::adaptiveThreshold(
+        gray,
+        binary,
+        255,
+        cv::ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv::THRESH_BINARY,
+        15,
+        5
+    );
+
+    fs::path inputFile(inputPath);
+    std::string outputPath = outputFolder + "/" + inputFile.stem().string() + "_binary.png";
+
+    cv::imwrite(outputPath, binary);
+}
 
 int main()
 {
-    std::cout << "TBB Image Thresholding project started!\n";
+    std::string inputFolder = "dataset";
+    std::string outputFolder = "output_sequential";
+
+    fs::create_directories(outputFolder);
+
+    std::vector<std::string> imagePaths = getImagePaths(inputFolder);
+
+    if (imagePaths.empty())
+    {
+        std::cout << "No images found in folder: " << inputFolder << std::endl;
+        return 1;
+    }
+
+    std::cout << "Found " << imagePaths.size() << " images." << std::endl;
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for (const auto& imagePath : imagePaths)
+    {
+        processImageSequential(imagePath, outputFolder);
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> elapsed = end - start;
+
+    double totalTime = elapsed.count();
+    double throughput = imagePaths.size() / totalTime;
+
+    std::cout << "\nSequential processing finished." << std::endl;
+    std::cout << "Total time: " << totalTime << " seconds" << std::endl;
+    std::cout << "Throughput: " << throughput << " images/second" << std::endl;
+
     return 0;
 }
 
