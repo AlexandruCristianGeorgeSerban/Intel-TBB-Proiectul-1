@@ -93,7 +93,7 @@ Instalarea bibliotecilor necesare:
 
 Proiectul este organizat pe branch-uri separate:
 
-* `main` → versiunea finală
+* `main` → raportul scris
 * `secvential` → implementare secvențială
 * `tbb-inter` → paralelizare între imagini
 * `tbb-intra` → paralelizare în interiorul imaginii
