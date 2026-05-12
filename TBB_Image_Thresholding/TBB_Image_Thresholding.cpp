@@ -84,7 +84,7 @@ int main()
     tbb::global_control control(tbb::global_control::max_allowed_parallelism, numThreads);
 
     cout << "Found " << imagePaths.size() << " images." << endl;
-    cout << "Starting TBB Inter-Image parallel processing..." << endl;
+    cout << "Starting TBB Inter-Image parallel processing with " << numThreads << " threads..." << endl;
 
     auto start = chrono::high_resolution_clock::now();
 
