@@ -49,32 +49,24 @@ void processImageIntra(const string& inputPath, const string& outputFolder)
     cv::Mat gray;
     cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
-    // Pregătim o matrice goală pentru rezultatul final, de aceeași dimensiune
     cv::Mat binary(gray.size(), gray.type());
-
-    // Împărțim imaginea în mai multe regiuni orizontale (chunks)
-    // 8 este un număr bun de thread-uri pentru procesoarele moderne
+    // numar de thread-uri
     int num_chunks = 8;
     int chunk_height = gray.rows / num_chunks;
 
-    // Cazul în care imaginea este extrem de mică (mai mică de 8 pixeli înălțime)
     if (chunk_height == 0) {
         num_chunks = 1;
         chunk_height = gray.rows;
     }
 
-    // Paralelizare INTRA-IMAGINE: procesăm bucăți din aceeași imagine simultan
     tbb::parallel_for(0, num_chunks, [&](int i) {
         int start_row = i * chunk_height;
-        // Ultimul chunk ia și restul de pixeli rămași
         int end_row = (i == num_chunks - 1) ? gray.rows : start_row + chunk_height;
 
-        // Definim ROI (Region of Interest) pentru bucata curentă
         cv::Rect roi(0, start_row, gray.cols, end_row - start_row);
         cv::Mat chunk_gray = gray(roi);
         cv::Mat chunk_binary;
 
-        // Aplicăm threshold-ul adaptiv pe sub-imagine
         cv::adaptiveThreshold(
             chunk_gray,
             chunk_binary,
@@ -85,7 +77,6 @@ void processImageIntra(const string& inputPath, const string& outputFolder)
             5
         );
 
-        // Copiem rezultatul calculat în imaginea finală binarizată, exact la locul lui
         chunk_binary.copyTo(binary(roi));
         });
 
@@ -97,11 +88,10 @@ void processImageIntra(const string& inputPath, const string& outputFolder)
 
 int main()
 {
-    // Ascundem mesajele INFO de la OpenCV
     cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_WARNING);
 
     string inputFolder = "dataset";
-    string outputFolder = "output_tbb_intra"; // Folder de output modificat corespunzător
+    string outputFolder = "output_tbb_intra"; 
 
     fs::create_directories(outputFolder);
 
@@ -118,7 +108,6 @@ int main()
 
     auto start = chrono::high_resolution_clock::now();
 
-    // Bucla exterioară este SECVENȚIALĂ. Paralelizarea se întâmplă doar ÎN INTERIORUL funcției.
     for (const auto& imagePath : imagePaths)
     {
         processImageIntra(imagePath, outputFolder);
