@@ -36,7 +36,7 @@ vector<string> getImagePaths(const string& folderPath)
     return imagePaths;
 }
 
-void processImageIntra(const string& inputPath, const string& outputFolder)
+void processImageIntra(const string& inputPath, const string& outputFolder, int numThreads)
 {
     cv::Mat image = cv::imread(inputPath);
 
@@ -50,8 +50,8 @@ void processImageIntra(const string& inputPath, const string& outputFolder)
     cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
     cv::Mat binary(gray.size(), gray.type());
-    // numar de thread-uri
-    int num_chunks = 8;
+
+    int num_chunks = numThreads;
     int chunk_height = gray.rows / num_chunks;
 
     if (chunk_height == 0) {
@@ -91,7 +91,7 @@ int main()
     cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_WARNING);
 
     string inputFolder = "dataset";
-    string outputFolder = "output_tbb_intra"; 
+    string outputFolder = "output_tbb_intra";
 
     fs::create_directories(outputFolder);
 
@@ -103,14 +103,18 @@ int main()
         return 1;
     }
 
+    // numar de thread-uri
+    int numThreads = 8;
+    tbb::global_control control(tbb::global_control::max_allowed_parallelism, numThreads);
+
     cout << "Found " << imagePaths.size() << " images." << endl;
-    cout << "Starting TBB Intra-Image parallel processing..." << endl;
+    cout << "Starting TBB Intra-Image parallel processing with " << numThreads << " threads..." << endl;
 
     auto start = chrono::high_resolution_clock::now();
 
     for (const auto& imagePath : imagePaths)
     {
-        processImageIntra(imagePath, outputFolder);
+        processImageIntra(imagePath, outputFolder, numThreads);
     }
 
     auto end = chrono::high_resolution_clock::now();
