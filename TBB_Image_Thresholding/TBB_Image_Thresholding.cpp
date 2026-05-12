@@ -33,7 +33,7 @@ vector<string> getImagePaths(const string& folderPath)
     return imagePaths;
 }
 
-void processImage(const string& inputPath, const string& outputFolder)
+void processImageInter(const string& inputPath, const string& outputFolder)
 {
     cv::Mat image = cv::imread(inputPath);
 
@@ -79,6 +79,10 @@ int main()
         return 1;
     }
 
+    // numar de thread-uri
+    int numThreads = 8;
+    tbb::global_control control(tbb::global_control::max_allowed_parallelism, numThreads);
+
     cout << "Found " << imagePaths.size() << " images." << endl;
     cout << "Starting TBB Inter-Image parallel processing..." << endl;
 
@@ -89,7 +93,7 @@ int main()
         imagePaths.end(),
         [&outputFolder](const string& imagePath)
         {
-            processImage(imagePath, outputFolder);
+            processImageInter(imagePath, outputFolder);
         }
     );
 
