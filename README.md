@@ -87,7 +87,7 @@ Descărcare și instalare [CUDA toolkit](https://developer.nvidia.com/cuda/toolk
 
 1. Deschideți soluția `.sln` în Visual Studio.
 2. Selectați configurația de performanță:
-   * `Release | x64` (Obligatoriu pentru măsurători corecte de viteză și speedup)
+   * `Debug | x64`
 3. Asigurați-vă că standardul C++ este:
    * `ISO C++17`
 4. **Specific pentru branch-ul `cuda`:** * Click dreapta pe proiect în Solution Explorer -> `Build Dependencies` -> `Build Customizations...` -> bifați `CUDA`.
