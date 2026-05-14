@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TBB_Image_Thresholding.cpp">
+    <ClCompile Include="TBB_Image_Thresholding.cu">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
