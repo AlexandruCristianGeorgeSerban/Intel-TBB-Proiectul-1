@@ -92,7 +92,7 @@ void processImageCUDA(const string& inputPath, const string& outputFolder)
     dim3 numBlocks((width + threadsPerBlock.x - 1) / threadsPerBlock.x,
         (height + threadsPerBlock.y - 1) / threadsPerBlock.y);
 
-    adaptiveThresholdKernel << <numBlocks, threadsPerBlock >> > (d_input, d_output, width, height, 15, 5);
+    adaptiveThresholdKernel <<<numBlocks, threadsPerBlock >>> (d_input, d_output, width, height, 15, 5);
 
     cudaDeviceSynchronize();
 
