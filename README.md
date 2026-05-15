@@ -91,9 +91,9 @@ Descărcare și instalare [CUDA toolkit](https://developer.nvidia.com/cuda/toolk
 3. Asigurați-vă că standardul C++ este:
    * `ISO C++17`
 4. **Specific pentru branch-ul `cuda`:** * Click dreapta pe proiect în Solution Explorer -> `Build Dependencies` -> `Build Customizations...` -> bifați `CUDA`.
-   * Asigurați-vă că fișierul sursă are setat `Item Type: CUDA C/C++`.
+   * Asigurați-vă că fișierul sursă are setat `Item Type: CUDA C/C++` și că la Command Line a fost adăugată comanda `-std=c++17`.
 5. Rulați proiectul folosind:
-   * `Ctrl + F5` (Start Without Debugging)
+   * `Ctrl + F5`
 
 ---
 
